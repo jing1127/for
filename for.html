@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>table</title>
+		<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+		<script type="text/javascript" src="js/vue.min.js"></script>
+		<style>
+			*{
+				margin:0;
+				padding: 0;
+			}
+			ul{
+				list-style: none;
+			}
+			.contain{
+				margin:160px auto;
+				text-align: center;
+				width:90%;
+				border: 1px solid #dedede;
+				color: #454545;
+				font-family: "黑体";
+			}
+			
+			.contain ul{
+				display: flex;
+			}
+			.contain .head li,.contain .fors li{
+				flex: 1;
+				border-left: 1px solid #dedede;
+			}
+			.contain .head li{
+				padding:6px;
+				background: #f3f3f3;
+				border-bottom: 1px solid #dedede;
+			}
+			.contain .fors li{
+				padding:10px;
+				border-top:1px solid #dedede;
+				color: #333;
+				font-size: 14px;
+			}
+			.contain .head .spe,.contain .fors .spe{
+				border-left: none;
+			}
+			.fors .btn{
+				background: #eaeaea;
+				padding:2px 6px;
+				border:1px solid #999;
+				color: #454545;
+			}
+		</style> 
+		<style>
+	    [v-cloak] {
+			        display: none;
+			    }
+		</style>
+	</head>
+	<body>
+		<div class="contain">
+			<ul class="head">
+				<li class="spe">序号</li>
+				<li>通道名</li>
+				<li>商户T0费率</li>
+				<li>商户T1费率</li>
+				<li>单笔最高金额</li>
+				<li>设置</li>
+			</ul> 
+			<ul class="fors" v-cloak v-for="item in datalist">
+				<li class="spe" id="sortby">{{item.sortby}}</li>
+				<li id="gate_name">{{item.gate_name}}</li>
+				<li>{{item.T0_rate}}</li>
+				<li>{{item.T1_rate}}</li>
+				<li>{{item.single_max}}</li>
+				<li <!--id="cli" onclick="djCheck();"-->>
+					<input type="button" id="btn" class="btn" value="上移" @click="resetCheck($index)" />
+				</li>
+			</ul>
+		</div>
+		<script>
+				$.ajax({
+						type:"post",
+						url:"http://192.168.1.162:8080/NEW/systemadmin/cmshow",
+						success:function(data){
+							$(".contain").css("display","block");
+							var vm = new Vue({
+								el : ".fors",
+								data : {
+									datalist : data.msg
+								},
+								methods : {
+									resetCheck : function(index){
+										var sortby = vm.datalist[index].sortby;
+										var gate_name=vm.datalist[index].gate_name;
+										if(index>0){
+										var temporary=[];
+										temporary.push(
+											 {pushName:vm.datalist[index].gate_name,
+											  pushT0:vm.datalist[index].T0_rate,
+											  pushT1:vm.datalist[index].T1_rate,
+											  pushSingle:vm.datalist[index].single_max}	
+										);
+										vm.datalist[index].gate_name=vm.datalist[index-1].gate_name;
+										vm.datalist[index].T0_rate=vm.datalist[index-1].T0_rate;
+										vm.datalist[index].T1_rate=vm.datalist[index-1].T1_rate;
+										vm.datalist[index].single_max=vm.datalist[index-1].single_max;
+										vm.datalist[index-1].gate_name=temporary[0].pushName;
+										vm.datalist[index-1].T0_rate=temporary[0].pushT0;
+										vm.datalist[index-1].T1_rate=temporary[0].pushT1;
+										vm.datalist[index-1].single_max=temporary[0].pushSingle;
+										}
+										
+//										vm.datalist.splice(index,1);
+//										$.ajax({
+//											type:"post",
+//											url:"http://192.168.1.162:8080/NEW/systemadmin/reshow",
+//											data:{
+//											"abc":111
+//											},
+//											dataType: "json",
+//											success:function(data){
+//											//alert(JSON.stringify(data.orderList));
+//											console.log("修改成功!");
+//											//window.location.reload();
+//											},
+//											error:function(){
+//											console.log("操作失败!");
+//											}
+//										});
+									}
+								}
+							})
+//							return;
+						},
+		          error:function(){
+			          console.log("操作失败!");
+					}
+				})
+//				function djCheck(){
+//					$.ajax({
+//							type:"post",
+//							url:"http://192.168.1.162:8080/NEW/systemadmin/reshow",
+//							data:{  
+//								"aaa":111
+//							},
+//							dataType: "json",
+//							success:function(data){
+//								//alert(JSON.stringify(data.orderList));
+//								console.log("修改成功!");
+//								//window.location.reload();
+//							},
+//			          error:function(){
+//				          console.log("操作失败!");
+//						}
+//					});
+//				}
+//				function resetCheck(){
+//					var sortby=$("#sortby").html();
+//					var gate_name=$("#gate_name").html();
+//					$.ajax({
+//							type:"post",
+//							url:"http://192.168.1.162:8080/NEW/systemadmin/reshow",
+//							data:{  
+//								"sortby":sortby,
+//								"gate_name":gate_name
+//							},
+//							dataType: "json",
+//							success:function(data){
+//								//alert(JSON.stringify(data.orderList));
+//								console.log("修改成功!");
+//								//window.location.reload();
+//							},
+//			          error:function(){
+//				          console.log("操作失败!");
+//						}
+//					});
+//				}
+		</script>
+	</body>
+</html>
